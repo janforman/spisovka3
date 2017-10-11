@@ -24,6 +24,28 @@ class EmailClient
     }
 
     /**
+     * Used only with IMAP extension
+     * @param array $attachment
+     * @return string
+     */
+    protected function getFilename($attachment)
+    {
+        $filename = $attachment->dparameters['filename'];
+        if (!$filename) {
+            // "filename" parameter is specified in MIME standard but let us check parameter "name" as fallback
+            $filename = $attachment->parameters['name'];
+        }
+        if (strpos($filename, '=?') === 0) {
+            $a = imap_mime_header_decode($filename);
+            $filename = $a[0]->text;
+            $charset = $a[0]->charset;
+            $filename = iconv($charset, 'utf-8', $filename);
+        }
+
+        return $filename;
+    }
+
+    /**
      * @return array Description
      */
     public function getAttachments()
@@ -35,13 +57,7 @@ class EmailClient
 
             $result = [];
             foreach ($attachments as $part_number => $at) {
-                $filename = $at->dparameters['filename'];
-                if (strpos($filename, '=?') === 0) {
-                    $a = imap_mime_header_decode($filename);
-                    $filename = $a[0]->text;
-                    $charset = $a[0]->charset;
-                    $filename = iconv($charset, 'utf-8', $filename);
-                }
+                $filename = $this->getFilename($at);
                 $size = $at->bytes;
                 if ($at->encoding == ENCBASE64)
                     $size = floor($size * 3 / 4 * 73 / 74);
@@ -72,11 +88,7 @@ class EmailClient
             }
             $data = $imap->decode_data($data, $part);
 
-            $filename = $part->dparameters['filename']; // Content-Disposition
-            if (!$filename) {
-                // pri poruseni MIME standardu v e-mailu zkusime jeste tuto moznost
-                $filename = $part->parameters['name'];
-            }
+            $filename = $this->getFilename($part);
         } else if ($this->mime_parser) {
             $part = $this->mime_parser->getPart($id);
             if (!$part)
