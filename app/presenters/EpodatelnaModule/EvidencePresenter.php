@@ -393,7 +393,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 'popis' => ''
             );
 
-            if ($uploaded = $storage->uploadDocument($data, $upload_info, $this->user)) {
+            if ($uploaded = $storage->uploadDocument($data['data'], $upload_info, $this->user)) {
                 $DokumentFile->pripojit($dokument_id, $uploaded->id);
             }
         }
