@@ -33,10 +33,9 @@ class Admin_SpisznakPresenter extends BasePresenter
         $this->template->title = " - Nový spisový znak";
     }
 
-    public function renderDetail()
+    public function renderDetail($id)
     {
         $this->template->FormUpravit = $this->getParameter('upravit', null);
-        $id = $this->getParameter('id', null);
 
         $SpisovyZnak = new SpisovyZnak();
         $this->spisznak = $SpisovyZnak->getInfo($id);
@@ -49,16 +48,17 @@ class Admin_SpisznakPresenter extends BasePresenter
 
     protected function _odebrat($odebrat_strom)
     {
-        $spisznak_id = $this->getParameter('id', null);
+        $spisznak_id = $this->getParameter('id');
         $SpisovyZnak = new SpisovyZnak();
         $res = $SpisovyZnak->odstranit($spisznak_id, $odebrat_strom);
-        if (!$res)
-            $this->flashMessage('Spisový znak je využíván v aplikaci.<br>Z toho důvodu není možné spisový znak odstranit.',
-                    'warning_ext');
-        else
+        if (!$res) {
+            $this->flashMessage("Spisový znak je využíván v aplikaci.\nZ toho důvodu není možné spisový znak odstranit.",
+                    'warning');
+            $this->redirect('detail', $spisznak_id);
+        } else {
             $this->flashMessage('Spisový znak byl úspěšně odstraněn.');
-
-        $this->redirect(':Admin:Spisznak:seznam');
+            $this->redirect('seznam');
+        }
     }
 
     public function actionOdebrat()
@@ -224,7 +224,7 @@ class Admin_SpisznakPresenter extends BasePresenter
         $default_event = StartEvent::getDefault();
         if ($default_event)
             $form['spousteci_udalost_id']->setDefaultValue($default_event->id);
-        
+
         $form->addSelect('parent_id', 'Připojit k:', $spisznak_seznam);
         $form->addSelect('stav', 'Stav:', SpisovyZnak::stav())
                 ->setDefaultValue(1);
