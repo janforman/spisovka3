@@ -84,7 +84,8 @@ class Spisovka_CronPresenter extends Nette\Application\UI\Presenter
     protected function taskCleanSessionFiles()
     {
         $session = $this->getSession();
-        $directory = $session->options['savePath'];
+        $options = $session->getOptions();
+        $directory = $options['save_path'];
         $directory = rtrim($directory, '/');
 
         $dir_handle = opendir($directory);
