@@ -220,7 +220,7 @@ class Spisovna_SpisyPresenter extends BasePresenter
             $this->redirect(':Spisovna:Spisy:detail', array('id' => $spis_id));
         } catch (DibiException $e) {
             $this->flashMessage('Spis se nepodařilo upravit.', 'warning');
-            $this->flashMessage('CHYBA: "' . $e->getMessage(), 'error_ext');
+            $this->flashMessage('CHYBA: "' . $e->getMessage(), 'error');
             $this->redirect(':Spisovna:Spisy:detail', array('id' => $spis_id));
             //Nette\Diagnostics\Debugger::dump($e);
         }

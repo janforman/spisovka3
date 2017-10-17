@@ -597,7 +597,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
         }
 
         $this->template->Typ_evidence = $this->typ_evidence;
-
+        $this->template->Rozepsany_dokument = false;
         $args_rozd = [];
         $args_rozd['where'] = [
             'stav = 0',
@@ -611,9 +611,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             // Oprava Task #254
             $dokument = new Document($dokument->id);
 
-            $this->flashMessage('Byl detekován a načten rozepsaný dokument.<p>Pokud chcete založit úplně nový dokument, klikněte na následující odkaz. <a href="'
-                    . $this->link('novy', ['cisty' => 1]) . '">Vytvořit nový nerozepsaný dokument.</a></p>',
-                    'info_ext');
+            $this->template->Rozepsany_dokument = true;
 
             $this->template->Subjekty = $dokument->getSubjects();
             $this->template->Prilohy = $dokument->getFiles();
@@ -1568,7 +1566,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $mail->send();
         } catch (\Exception $e) {
-            $this->flashMessage('Chyba při odesílání emailu! ' . $e->getMessage(), 'error_ext');
+            $this->flashMessage('Chyba při odesílání emailu! ' . $e->getMessage(), 'error');
             return false;
         }
 
@@ -1652,7 +1650,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             
             $id_mess = $isds->odeslatZpravu($envelope, $prilohy, $this->storage);
             if (!$id_mess) {
-                $this->flashMessage('Chyba ISDS: ' . $isds->GetStatusMessage(), 'warning_ext');
+                $this->flashMessage('Chyba ISDS: ' . $isds->GetStatusMessage(), 'warning');
                 return false;
             }
 
@@ -1724,7 +1722,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
             
             return $isds_msg->id;
         } catch (\Exception $e) {
-            $this->flashMessage('Chyba: ' . $e->getMessage(), 'warning_ext');
+            $this->flashMessage('Chyba: ' . $e->getMessage(), 'warning');
         }
 
         return false;

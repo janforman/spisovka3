@@ -38,6 +38,11 @@
     {/if}
     </div>
 
+    <div n:if="$Rozepsany_dokument" class="flash_message flash_info">Byl detekován a načten rozepsaný dokument.<br />
+        Pokud chcete založit úplně nový dokument, klikněte
+        <a n:href="novy, cisty => 1">sem</a>.
+    </div>
+    
     {form $form_name}
     <div class="dokument_blok_hlavni">
         <dl>

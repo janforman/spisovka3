@@ -31,7 +31,7 @@ class EmailAvizo
       //$mail->send();
       return true;
       } catch (\Exception $e) {
-      //throw new Nette\InvalidStateException('Chyba při odesílání emailu! '. $e->getMessage(),'error_ext');
+      //throw new Nette\InvalidStateException('Chyba při odesílání emailu! '. $e->getMessage(),'error');
       return false;
       }
       } */
@@ -73,7 +73,7 @@ class EmailAvizo
           //$mail->send();
           return true;
           } catch (\Exception $e) {
-          //throw new Nette\InvalidStateException('Chyba při odesílání emailu! '. $e->getMessage(),'error_ext');
+          //throw new Nette\InvalidStateException('Chyba při odesílání emailu! '. $e->getMessage(),'error');
           return false;
           } */
     }

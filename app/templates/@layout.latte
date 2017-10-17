@@ -54,7 +54,7 @@
     {/if}
 
     <div n:if="count($flashes)>0" id="flash">
-        {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{if strpos($flash->type,"_ext") !== false}{$flash->message}{else}{$flash->message|breaklines}{/if}</div>{/foreach}
+        {foreach $flashes as $flash}<div class="flash_message flash_{$flash->type}">{$flash->message|breaklines}</div>{/foreach}
     </div>
     {if $presenter->name == 'Spisovka:Napoveda'}
         {include #content}

@@ -551,13 +551,13 @@ a#bulk-select-all, a#bulk-select-none {
     background: #ffffcc ;
 }
 
-.flash_info, .flash_info_ext {
+.flash_info {
     color: #666600;
     border: 1px #666600 solid;
     background: #ffffcc url('../images/icons/dialog-information.png') 10px 5px no-repeat;
 }
 
-.flash_notice, .flash_notice_ext {
+.flash_notice {
     color: #666600;
     border: 1px #666600 solid;
     background: #ffffcc url('../images/icons/dialog-warning.png') 10px 5px no-repeat;
@@ -565,7 +565,7 @@ a#bulk-select-all, a#bulk-select-none {
 
 /* Aplikace zcela nekonzistentně používá warning a error, že lepší pokaždé použít
    stejný vzhled */
-.flash_warning, .flash_warning_ext, .flash_error, .flash_error_ext {
+.flash_warning, .flash_error {
     color: #681203;
     border: 1px #681203 solid;
     background: #ffcccc url('../images/icons/dialog-warning.png') 10px 5px no-repeat;
