@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "191e4c2a6c427573ef151b2829c0294d",
+    "content-hash": "c044aa762cb3703566c3f9417133d0e1",
     "packages": [
         {
             "name": "dibi/dibi",
@@ -357,30 +357,31 @@
         },
         {
             "name": "nette/caching",
-            "version": "v2.4.7",
+            "version": "v2.5.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/caching.git",
-                "reference": "f56c5e0342cdca078c5e617efb2be8af38de5eee"
+                "reference": "1231735b5135ca02bd381b70482c052d2a90bdc9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/caching/zipball/f56c5e0342cdca078c5e617efb2be8af38de5eee",
-                "reference": "f56c5e0342cdca078c5e617efb2be8af38de5eee",
+                "url": "https://api.github.com/repos/nette/caching/zipball/1231735b5135ca02bd381b70482c052d2a90bdc9",
+                "reference": "1231735b5135ca02bd381b70482c052d2a90bdc9",
                 "shasum": ""
             },
             "require": {
-                "nette/finder": "~2.2",
-                "nette/utils": "~2.2",
-                "php": ">=5.4.4"
+                "nette/finder": "^2.2 || ~3.0.0",
+                "nette/utils": "^2.4 || ~3.0.0",
+                "php": ">=5.6.0"
             },
             "conflict": {
                 "nette/nette": "<2.2"
             },
             "require-dev": {
-                "latte/latte": "~2.3.0",
-                "nette/di": "~2.3",
-                "nette/tester": "~1.6"
+                "latte/latte": "^2.4",
+                "nette/di": "^2.4 || ~3.0.0",
+                "nette/tester": "^2.0",
+                "tracy/tracy": "^2.4"
             },
             "suggest": {
                 "ext-pdo_sqlite": "to use SQLiteStorage or SQLiteJournal"
@@ -388,7 +389,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.4-dev"
+                    "dev-master": "2.5-dev"
                 }
             },
             "autoload": {
@@ -412,9 +413,16 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "Nette Caching Component",
+            "description": "⏱ Nette Caching: library with easy-to-use API and many cache backends.",
             "homepage": "https://nette.org",
-            "time": "2016-10-06T00:12:19+00:00"
+            "keywords": [
+                "cache",
+                "journal",
+                "memcached",
+                "nette",
+                "sqlite"
+            ],
+            "time": "2017-08-30T12:12:25+00:00"
         },
         {
             "name": "nette/component-model",
@@ -475,16 +483,16 @@
         },
         {
             "name": "nette/di",
-            "version": "v2.4.9",
+            "version": "v2.4.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/di.git",
-                "reference": "25437788ff126d0ae6b1f2f684ecdd823812abba"
+                "reference": "a4b3be935b755f23aebea1ce33d7e3c832cdff98"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/di/zipball/25437788ff126d0ae6b1f2f684ecdd823812abba",
-                "reference": "25437788ff126d0ae6b1f2f684ecdd823812abba",
+                "url": "https://api.github.com/repos/nette/di/zipball/a4b3be935b755f23aebea1ce33d7e3c832cdff98",
+                "reference": "a4b3be935b755f23aebea1ce33d7e3c832cdff98",
                 "shasum": ""
             },
             "require": {
@@ -529,9 +537,18 @@
                     "homepage": "https://nette.org/contributors"
                 }
             ],
-            "description": "Nette Dependency Injection Component",
+            "description": "💎 Nette Dependency Injection Container: Flexible, compiled and full-featured DIC with perfectly usable autowiring and support for all new PHP 7.1 features.",
             "homepage": "https://nette.org",
-            "time": "2017-07-11T17:55:11+00:00"
+            "keywords": [
+                "compiled",
+                "di",
+                "dic",
+                "factory",
+                "ioc",
+                "nette",
+                "static"
+            ],
+            "time": "2017-08-31T22:42:00+00:00"
         },
         {
             "name": "nette/finder",
@@ -1211,16 +1228,16 @@
         },
         {
             "name": "tracy/tracy",
-            "version": "v2.4.9",
+            "version": "v2.4.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/tracy.git",
-                "reference": "efe45da0aa3a50ce5356be39f2168d7925d94f3d"
+                "reference": "5b302790edd71924dfe4ec44f499ef61df3f53a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/tracy/zipball/efe45da0aa3a50ce5356be39f2168d7925d94f3d",
-                "reference": "efe45da0aa3a50ce5356be39f2168d7925d94f3d",
+                "url": "https://api.github.com/repos/nette/tracy/zipball/5b302790edd71924dfe4ec44f499ef61df3f53a2",
+                "reference": "5b302790edd71924dfe4ec44f499ef61df3f53a2",
                 "shasum": ""
             },
             "require": {
@@ -1274,7 +1291,7 @@
                 "nette",
                 "profiler"
             ],
-            "time": "2017-08-16T17:13:36+00:00"
+            "time": "2017-10-04T18:43:42+00:00"
         }
     ],
     "packages-dev": [],
@@ -1284,7 +1301,7 @@
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=5.5.0",
+        "php": ">= 5.6",
         "ext-fileinfo": "*",
         "ext-zip": "*"
     },

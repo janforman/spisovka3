@@ -14,13 +14,15 @@ use Nette\Caching\Cache;
 /**
  * SQLite storage.
  */
-class SQLiteStorage extends Nette\Object implements Nette\Caching\IStorage
+class SQLiteStorage implements Nette\Caching\IStorage, Nette\Caching\IBulkReader
 {
+	use Nette\SmartObject;
+
 	/** @var \PDO */
 	private $pdo;
 
 
-	public function __construct($path = ':memory:')
+	public function __construct($path)
 	{
 		if ($path !== ':memory:' && !is_file($path)) {
 			touch($path); // ensures ordinary file permissions
@@ -50,15 +52,15 @@ class SQLiteStorage extends Nette\Object implements Nette\Caching\IStorage
 
 	/**
 	 * Read from cache.
-	 * @param  string key
-	 * @return mixed|NULL
+	 * @param  string
+	 * @return mixed
 	 */
 	public function read($key)
 	{
 		$stmt = $this->pdo->prepare('SELECT data, slide FROM cache WHERE key=? AND (expire IS NULL OR expire >= ?)');
 		$stmt->execute([$key, time()]);
 		if ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-			if ($row['slide'] !== NULL) {
+			if ($row['slide'] !== null) {
 				$this->pdo->prepare('UPDATE cache SET expire = ? + slide WHERE key=?')->execute([time(), $key]);
 			}
 			return unserialize($row['data']);
@@ -67,8 +69,33 @@ class SQLiteStorage extends Nette\Object implements Nette\Caching\IStorage
 
 
 	/**
+	 * Reads from cache in bulk.
+	 * @param  string
+	 * @return array key => value pairs, missing items are omitted
+	 */
+	public function bulkRead(array $keys)
+	{
+		$stmt = $this->pdo->prepare('SELECT key, data, slide FROM cache WHERE key IN (?' . str_repeat(',?', count($keys) - 1) . ') AND (expire IS NULL OR expire >= ?)');
+		$stmt->execute(array_merge($keys, [time()]));
+		$result = [];
+		$updateSlide = [];
+		foreach ($stmt->fetchAll(\PDO::FETCH_ASSOC) as $row) {
+			if ($row['slide'] !== null) {
+				$updateSlide[] = $row['key'];
+			}
+			$result[$row['key']] = unserialize($row['data']);
+		}
+		if (!empty($updateSlide)) {
+			$stmt = $this->pdo->prepare('UPDATE cache SET expire = ? + slide WHERE key IN(?' . str_repeat(',?', count($updateSlide) - 1) . ')');
+			$stmt->execute(array_merge([time()], $updateSlide));
+		}
+		return $result;
+	}
+
+
+	/**
 	 * Prevents item reading and writing. Lock is released by write() or remove().
-	 * @param  string key
+	 * @param  string
 	 * @return void
 	 */
 	public function lock($key)
@@ -78,15 +105,14 @@ class SQLiteStorage extends Nette\Object implements Nette\Caching\IStorage
 
 	/**
 	 * Writes item into the cache.
-	 * @param  string key
-	 * @param  mixed  data
-	 * @param  array  dependencies
+	 * @param  string
+	 * @param  mixed
 	 * @return void
 	 */
 	public function write($key, $data, array $dependencies)
 	{
-		$expire = isset($dependencies[Cache::EXPIRATION]) ? $dependencies[Cache::EXPIRATION] + time() : NULL;
-		$slide = isset($dependencies[Cache::SLIDING]) ? $dependencies[Cache::EXPIRATION] : NULL;
+		$expire = isset($dependencies[Cache::EXPIRATION]) ? $dependencies[Cache::EXPIRATION] + time() : null;
+		$slide = isset($dependencies[Cache::SLIDING]) ? $dependencies[Cache::EXPIRATION] : null;
 
 		$this->pdo->exec('BEGIN TRANSACTION');
 		$this->pdo->prepare('REPLACE INTO cache (key, data, expire, slide) VALUES (?, ?, ?, ?)')
@@ -106,7 +132,7 @@ class SQLiteStorage extends Nette\Object implements Nette\Caching\IStorage
 
 	/**
 	 * Removes item from the cache.
-	 * @param  string key
+	 * @param  string
 	 * @return void
 	 */
 	public function remove($key)
@@ -139,5 +165,4 @@ class SQLiteStorage extends Nette\Object implements Nette\Caching\IStorage
 			$this->pdo->prepare($sql)->execute($args);
 		}
 	}
-
 }
