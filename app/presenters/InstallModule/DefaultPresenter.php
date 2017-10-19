@@ -196,6 +196,13 @@ class Install_DefaultPresenter extends BasePresenter
             'errorMessage' => 'Chybí. Je potřeba pro komunikaci s datovou schránkou.',
         );
         $requirements_application[] = array(
+            'title' => 'Rozšíření XML',
+            'required' => true,
+            'passed' => extension_loaded('xml'),
+            'message' => 'Ano',
+            'errorMessage' => 'Chybí. Je potřeba pro kontrolu nových verzí aplikace.',
+        );
+        $requirements_application[] = array(
             'title' => 'Rozšíření ZIP',
             'required' => TRUE,
             'passed' => extension_loaded('zip'),
