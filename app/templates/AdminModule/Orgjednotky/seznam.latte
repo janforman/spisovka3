@@ -9,7 +9,7 @@
     {control search}
     
     <div class="blok_menu">
-        <a href="{link :Admin:Orgjednotky:novy}">Nová organizační jednotka</a>
+        <a n:href="novy">Nová organizační jednotka</a>
     </div>
 
     {if count($seznam)>0}
@@ -20,10 +20,10 @@
             <th>Zkratka / číselná řada</th>
         </tr>
         {foreach $seznam as $org}
-        <tr {if $org->stav != 1}class="item-noactive"{/if}>
-            <td>{str_repeat("&nbsp;", 5 * $org->uroven)|noescape}<a href="{link detail, 'id' => $org->id}"{if $org->stav != 1} style="color:#c0c0c0;"{/if}>{$org->zkraceny_nazev}</a></td>
-            <td{if $org->stav != 1} style="color:#c0c0c0;"{/if}>{$org->plny_nazev}</td>
-            <td{if $org->stav != 1} style="color:#c0c0c0;"{/if}>{$org->ciselna_rada}</td>
+        <tr {if $org->stav != 1}class="spis_znak_neaktivni"{/if}>
+            <td>{str_repeat("&nbsp;", 5 * $org->uroven)|noescape}<a n:href="detail, $org->id">{$org->zkraceny_nazev}</a></td>
+            <td>{$org->plny_nazev}</td>
+            <td>{$org->ciselna_rada}</td>
         </tr>
         {/foreach}
     </table>
