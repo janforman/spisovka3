@@ -4,7 +4,7 @@ namespace Spisovka;
 
 use Nette;
 
-abstract class BaseModel
+class BaseModel
 {
 
     /** @var string object name */
@@ -35,9 +35,12 @@ abstract class BaseModel
     /**
      * Někteří potomci volají parent::__construct()
      */
-    public function __construct()
+    public function __construct($table_name = null)
     {
-        
+        if ($table_name)
+            $this->name = $table_name;
+        if (!$this->name)
+            throw new \Exception(__METHOD__ . '() - nebyl specifikován název tabulky');
     }
 
     /**
