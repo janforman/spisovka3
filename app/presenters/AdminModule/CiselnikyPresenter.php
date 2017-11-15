@@ -32,13 +32,6 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $ciselnik = new Components\Ciselnik();
         $ciselnik->setTable('dokument_typ');
 
-        $ciselnik->addColumn('id', array(
-            'title' => 'ID',
-            'link' => false,
-            'form' => 'hidden',
-            'view' => false
-                )
-        );
         $ciselnik->addColumn('nazev', array(
             'title' => 'Název',
             'link' => true,
@@ -103,13 +96,6 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $ciselnik = new Components\Ciselnik();
         $ciselnik->setTable('zpusob_vyrizeni');
 
-        $ciselnik->addColumn('id', array(
-            'title' => 'ID',
-            'link' => false,
-            'form' => 'hidden',
-            'view' => false
-                )
-        );
         $ciselnik->addColumn('nazev', array(
             'title' => 'Název',
             'link' => true,
@@ -154,13 +140,6 @@ class Admin_CiselnikyPresenter extends BasePresenter
 
         $ciselnik = new Components\Ciselnik();
         $ciselnik->setTable('zpusob_odeslani');
-        $ciselnik->addColumn('id', array(
-            'title' => 'ID',
-            'link' => false,
-            'form' => 'hidden',
-            'view' => false
-                )
-        );
         $ciselnik->addColumn('nazev', array(
             'title' => 'Název',
             'link' => true,
@@ -206,13 +185,6 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $ciselnik = new Components\Ciselnik();
         $ciselnik->setTable('zpusob_doruceni');
 
-        $ciselnik->addColumn('id', array(
-            'title' => 'ID',
-            'link' => false,
-            'form' => 'hidden',
-            'view' => false
-                )
-        );
         $ciselnik->addColumn('nazev', array(
             'title' => 'Název',
             'link' => true,
@@ -265,13 +237,6 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $ciselnik = new CiselnikSpousteciUdalost();
         $ciselnik->setTable('spousteci_udalost');
 
-        $ciselnik->addColumn('id', array(
-            'title' => 'ID',
-            'link' => false,
-            'form' => 'hidden',
-            'view' => false
-                )
-        );
         $ciselnik->addColumn('nazev', array(
             'title' => 'Název',
             'link' => true,
@@ -319,13 +284,6 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $ciselnik->setTable('stat');
         $ciselnik->orderBy('nazev');
 
-        $ciselnik->addColumn('id', array(
-            'title' => 'ID',
-            'link' => false,
-            'form' => 'hidden',
-            'view' => false
-                )
-        );
         $ciselnik->addColumn('nazev', array(
             'title' => 'Název',
             'link' => true,
@@ -366,13 +324,6 @@ class Admin_CiselnikyPresenter extends BasePresenter
         $ciselnik->disableDelete();
         $ciselnik->orderBy('order');
 
-        $ciselnik->addColumn('id', array(
-            'title' => 'ID',
-            'link' => false,
-            'form' => 'hidden',
-            'view' => false
-                )
-        );
         $ciselnik->addColumn('nazev', array(
             'title' => 'Název',
             'link' => true,

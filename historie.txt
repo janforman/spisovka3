@@ -30,6 +30,7 @@ Opravy:
   kroku. To zamezí problémům způsobených chybnou obsluhou aplikace, kdy v minu-
   losti uživatel omylem místo nového dokumentu mohl vytvořit odpověď na jiný
   dokument.
+- opravena chyba bránící vytvoření nových položek v číselnících
   
 === Verze 3.5.0 ================================================================
 

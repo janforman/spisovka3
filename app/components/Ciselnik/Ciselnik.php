@@ -72,7 +72,7 @@ class Ciselnik extends Nette\Application\UI\Control
 
     public function render()
     {
-        $model = new \Spisovka\Model($this->tableName);
+        $model = new \Spisovka\BaseModel($this->tableName);
 
         if ($this->getParameter('edit')) {
             // form - uprava
@@ -99,11 +99,9 @@ class Ciselnik extends Nette\Application\UI\Control
                 }
             }
 
-            $data = $model->fetchAll($cols, $this->orderBy);
-            $this->template->data = $data->fetchAll();
+            $result = $model->select(null, $this->orderBy);
+            $this->template->data = $result->fetchAll();
             $this->template->cols = $this->cols;
-
-            $this->template->primaryKeyName = 'id';
 
             $this->template->setFile(dirname(__FILE__) . '/template.phtml');
             $this->template->render();
@@ -116,9 +114,8 @@ class Ciselnik extends Nette\Application\UI\Control
         $form->onSubmit[] = array($this, 'formSubmitHandler');
 
         if (count($this->cols) > 0) {
-
             if ($this->action == 'edit') {
-                $model = new \Spisovka\Model($this->tableName);
+                $model = new \Spisovka\BaseModel($this->tableName);
                 $this->data = $model->select([["[id] = ", $this->getParameter('edit')]])->fetch();
             }
 
@@ -129,9 +126,7 @@ class Ciselnik extends Nette\Application\UI\Control
                     continue; // sloupec se negeneruje
                 }
 
-                if ($col_params['form'] == "hidden") {
-                    $form->addHidden($col_name);
-                } else if ($col_params['form'] == "textArea") {
+                if ($col_params['form'] == "textArea") {
                     $form->addTextArea($col_name, $col_params['title'], 50, 4);
                 } else if ($col_params['form'] == "password") {
                     $form->addPassword($col_name, $col_params['title']);
@@ -193,15 +188,11 @@ class Ciselnik extends Nette\Application\UI\Control
     {
         // was form submitted?
         if ($form->isSubmitted()) {
-
             $values = $form->getValues();
             $data = $form->getHttpData();
 
-            if (isset($values['stav']) && isset($data['stav'])) {
-                if ($values['stav'] != $data['stav']) {
-                    $values['stav'] = $data['stav'];
-                }
-            }
+            if (isset($values['stav']) && isset($data['stav']) && $values['stav'] != $data['stav'])
+                $values['stav'] = $data['stav'];
 
             if (isset($data['novyCiselnik'])) {
                 $this->handleNew($values);
@@ -223,8 +214,7 @@ class Ciselnik extends Nette\Application\UI\Control
     public function handleNew($values)
     {
         try {
-
-            $model = new \Spisovka\Model($this->tableName);
+            $model = new \Spisovka\BaseModel($this->tableName);
             $model->insert($values);
             $this->dataChangedHandler();
 
@@ -243,7 +233,7 @@ class Ciselnik extends Nette\Application\UI\Control
     public function handleEdit($values, $id)
     {
         try {
-            $model = new \Spisovka\Model($this->tableName);
+            $model = new \Spisovka\BaseModel($this->tableName);
             $model->update($values, [['%and', ['id' => $id]]]);
             $this->dataChangedHandler();
 
@@ -262,7 +252,7 @@ class Ciselnik extends Nette\Application\UI\Control
     public function handleDelete($id)
     {
         try {
-            $model = new \Spisovka\Model($this->tableName);
+            $model = new \Spisovka\BaseModel($this->tableName);
             $model->delete([['%and', ['id' => $id]]]);
             $this->dataChangedHandler();
 
@@ -284,7 +274,7 @@ class Ciselnik extends Nette\Application\UI\Control
             $this->redirect('this');
     }
 
-    // Určeno k přepsání v případné třídě potomka
+    /** Určeno k přepsání v případné třídě potomka */
     protected function dataChangedHandler()
     {
         
