@@ -4,7 +4,7 @@ namespace Spisovka;
 
 use Nette;
 
-class Storage_Basic extends BaseModel
+class Storage_Basic
 {
     private $document_dir;
     private $epodatelna_dir;
@@ -13,8 +13,6 @@ class Storage_Basic extends BaseModel
 
     public function __construct(array $params, Nette\Http\IResponse $httpResponse)
     {
-        parent::__construct();
-
         $this->httpResponse = $httpResponse;
 
         $this->document_dir = $params['path_documents'];
