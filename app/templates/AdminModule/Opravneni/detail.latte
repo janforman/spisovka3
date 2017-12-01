@@ -1,7 +1,7 @@
 {block title}detail role {$Role->name}{/block}
 {block content}
     <div class="navigate">
-    <a href="{link :Admin:Opravneni:seznam}">Seznam rolí</a> - Detail role
+    <a href="{link seznam}">Seznam rolí</a> - Detail role
     </div>
     <h2>{$Role->name}</h2>
 
@@ -16,15 +16,15 @@
         </dl>
         <dl>
             <dt>Dědí z role:</dt>
-            <dd>{if $Role->parent_id !== null}{(new Role($Role->parent_id))->name}{/if}</dd>
+            <dd>{if $Role->parent_id !== null}{(new Spisovka\Role($Role->parent_id))->name}{/if}</dd>
         </dl>
         <dl>
             <dt>Popis role:</dt>
             <dd>{$Role->note|breaklines}</dd>
         </dl>
-        <a href="{link :Admin:Opravneni:detail, 'id'=>$Role->id, 'upravit'=>'info'}">Upravit</a>
+        <a href="{link detail, 'id'=>$Role->id, 'upravit'=>'info'}">Upravit</a>
         {if $Role->fixed == 0}
-        &nbsp;<a href="{link :Admin:Opravneni:smazat, 'id'=>$Role->id}" onClick="return confirm('Ujistěte se, že role není přiřazena některému z uživatelů. Také z role nesmí jiné role dědit, aby ji bylo možné smazat.\nOpravdu chcete provést smazání?');">Smazat</a>
+        &nbsp;<a href="{link smazat, 'id'=>$Role->id}" onClick="return confirm('Ujistěte se, že role není přiřazena některému z uživatelů. Také z role nesmí jiné role dědit, aby ji bylo možné smazat.\nOpravdu chcete provést smazání?');">Smazat</a>
         {/if}
         {/if}
     </div>
