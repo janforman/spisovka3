@@ -102,7 +102,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $this->template->back = $this->getParameter('back', 'nove');
 
         if ($msg instanceof IsdsMessage) {
-            $envelope = $msg->formatEnvelope($this->storage);
+            $envelope = $msg->formatEnvelope();
             if ($envelope)
                 $this->template->Zprava->popis = $envelope;
             else if ($msg->odchozi) {

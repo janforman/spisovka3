@@ -129,13 +129,20 @@ class IsdsMessage extends EpodatelnaMessage
     }
 
     /**
+     * @return \stdClass envelope
+     */
+    public function getEnvelope()
+    {
+        return unserialize($this->isds_envelope);
+    }
+    
+    /**
      * Zformátuje uloženou obálku zprávy pro zobrazení. Výstup se liší pro příchozí a odchozí zprávu.
-     * @param Storage_Basic $storage
      * @return string  plain text
      */
-    public function formatEnvelope($storage)
+    public function formatEnvelope()
     {
-        $env = unserialize($this->isds_envelope);
+        $env = $this->getEnvelope();
 
         $annotation = $env->dmAnnotation;
         $popis = '';

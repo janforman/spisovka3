@@ -152,6 +152,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
     protected function createComponentNovyForm()
     {
+        $zprava = EpodatelnaMessage::factory($this->getParameter('id'));
+
         $form = new Form();
 
         $form->addHidden('predano_user');
@@ -165,7 +167,8 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         if (isset($typy_dokumentu[1]))
             $form['dokument_typ_id']->setDefaultValue(1);
 
-        $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
+        if ($zprava instanceof EmailMessage)
+            $form->addText('cislo_jednaci_odesilatele', 'Číslo jednací odesilatele:', 50, 50);
 
         $form->addDatePicker('datum_vzniku', 'Datum doručení:');
         $form->addText('datum_vzniku_cas', 'Čas doručení:', 10, 15);
@@ -180,19 +183,16 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3);
 
-        $zprava = isset($this->template->Zprava) ? $this->template->Zprava : null;
-        if ($zprava) {
-            $form['nazev']->setValue($zprava->predmet);
-            if ($zprava->typ == 'E' && Settings::get('epodatelna_copy_email_into_documents_note'))
-                $form['poznamka']->setValue(@html_entity_decode($zprava->popis));
-            $unixtime = strtotime($zprava->doruceno_dne);
-            $datum = date('d.m.Y', $unixtime);
-            $cas = date('H:i:s', $unixtime);
-            $form['datum_vzniku']
-                    ->setValue($datum);
-            $form['datum_vzniku_cas']
-                    ->setValue($cas);
-        }
+        $form['nazev']->setDefaultValue($zprava->predmet);
+        if ($zprava->typ == 'E' && Settings::get('epodatelna_copy_email_into_documents_note'))
+            $form['poznamka']->setDefaultValue(@html_entity_decode($zprava->popis));
+        $unixtime = strtotime($zprava->doruceno_dne);
+        $datum = date('d.m.Y', $unixtime);
+        $cas = date('H:i:s', $unixtime);
+        $form['datum_vzniku']
+                ->setDefaultValue($datum);
+        $form['datum_vzniku_cas']
+                ->setDefaultValue($cas);
 
         $form->addSubmit('novy', 'Vytvořit')
                 ->onClick[] = array($this, 'evidovatClicked');
@@ -238,8 +238,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             dibi::begin();
 
             $d = [
-                'dokument_typ_id' => isset($data['dokument_typ_id']) ? $data['dokument_typ_id']
-                    : 1,
+                'dokument_typ_id' => isset($data['dokument_typ_id']) ? $data['dokument_typ_id'] : 1,
                 'zpusob_doruceni_id' => $zprava->typ == 'E' ? 1 : 2,
                 'poradi' => 1,
                 'stav' => 1,
@@ -248,8 +247,14 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 'poznamka' => $data['poznamka'],
                 'datum_vzniku' => $datum_vzniku,
             ];
-            if (isset($data['cislo_jednaci_odesilatele']))
+            if (!empty($data['cislo_jednaci_odesilatele']))
                 $d['cislo_jednaci_odesilatele'] = $data['cislo_jednaci_odesilatele'];
+            else if ($zprava instanceof IsdsMessage) {
+                $env = $zprava->getEnvelope();
+                if (!empty($env->dmSenderRefNumber))
+                    $d['cislo_jednaci_odesilatele'] = $env->dmSenderRefNumber;
+            }
+
             if (isset($data['pocet_listu']))
                 $d['pocet_listu'] = $data['pocet_listu'];
             if (isset($data['pocet_listu_priloh']))

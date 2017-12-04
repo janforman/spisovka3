@@ -14,7 +14,9 @@
             <dt>Datum a čas doručení:</dt>
             <dd>{input datum_vzniku} {input datum_vzniku_cas} {inputError2 datum_vzniku}</dd>
         </dl>
-        {input2 cislo_jednaci_odesilatele}
+        {if isset($form['cislo_jednaci_odesilatele'])}
+            {input2 cislo_jednaci_odesilatele}
+        {/if}
         {input2 poznamka}
     </div>
 
