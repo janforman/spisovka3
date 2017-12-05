@@ -54,7 +54,7 @@ class Spisovka_LDAP extends LDAP_Connection
             $this->bind($this->params->search_dn, $this->params->search_password);
 
         $search = str_replace('%username%', $username, $this->params->user_search);
-        $result = $this->search($this->params->base_dn, $search, false);
+        $result = $this->search($this->params->base_dn, $search);
         if ($result['count'] != 1)
             return false;
         
@@ -68,24 +68,33 @@ class Spisovka_LDAP extends LDAP_Connection
 
         $result = $this->search($this->params->base_dn, $this->params->search_filter);
 
-        $users = $this->parse_users($result);
+        $users = $this->parse_users($result);        
+        usort($users, [$this, 'compare_users']);
         return $users;
     }
 
+    protected function compare_users($a, $b)
+    {
+        $res = strcasecmp($a['prijmeni'], $b['prijmeni']);
+        if ($res)
+            return $res;
+        return strcasecmp($a['jmeno'], $b['jmeno']);
+    }
+    
     protected function parse_users($info)
     {
-        $user = array();
+        $users = array();
 
         for ($i = 0; $i < $info["count"]; $i++) {
             foreach ($this->attribute_map as $from => $to) {
                 if (isset($info[$i][$from][0]))
-                    $user[$i][$to] = $info[$i][$from][0];
-                elseif (!isset($user[$i][$to]))
-                    $user[$i][$to] = null;
+                    $users[$i][$to] = $info[$i][$from][0];
+                elseif (!isset($users[$i][$to]))
+                    $users[$i][$to] = null;
             }
         }
 
-        return $user ?: null;
+        return $users ?: null;
     }
 
 }

@@ -33,6 +33,8 @@ Opravy:
   losti uživatel omylem místo nového dokumentu mohl vytvořit odpověď na jiný
   dokument.
 - opravena chyba bránící vytvoření nových položek v číselnících
+- funkce ldap_search je od PHP 7.0 deprecated. Aplikace tedy nyní řadí seznam
+  uživatelů z LDAP adresáře sama (dle příjmení a jména uživatele).
   
 === Verze 3.5.0 ================================================================
 

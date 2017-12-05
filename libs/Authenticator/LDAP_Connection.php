@@ -46,14 +46,13 @@ class LDAP_Connection
             $this->error();
     }
 
-    public function search($base_dn, $filter, $sort = 'sn')
+    public function search($base_dn, $filter)
     {
         $result = ldap_search($this->conn, $base_dn, $filter);
         if (!$result)
             $this->error();
-        if ($sort)
-            ldap_sort($this->conn, $result, $sort);
-        return ldap_get_entries($this->conn, $result);
+        $entries = ldap_get_entries($this->conn, $result);
+        return $entries;
     }
 
 }
