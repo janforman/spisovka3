@@ -300,14 +300,15 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
             ob_start();
             $response->send($this->getHttpRequest(), $this->getHttpResponse());
             $content = ob_get_clean();
+            
+            @ini_set("memory_limit", PDF_MEMORY_LIMIT);
             $this->pdfExport($content);
+            die; // toto je důležité, jinak Nette k PDF výstupu připojí HTML kód šablony
         }
     }
 
     protected function pdfExport($content)
     {
-        @ini_set("memory_limit", PDF_MEMORY_LIMIT);
-
         // mPDF obsahuje spoustu chyb a omezení
         $search = ['<td', '</dd><br />', '<dd></dd>'];
         $replace = ['<td valign="top"', '</dd>', '<dd>&nbsp;</dd>'];
@@ -335,7 +336,7 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
 
         $mpdf->WriteHTML($content);
 
-        $mpdf->Output('sestava.pdf', 'I');
+        $mpdf->Output('spisovka.pdf', 'I');
     }
 
 }

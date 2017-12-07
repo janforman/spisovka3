@@ -61,7 +61,6 @@ class Spisovka_VypravnaPresenter extends BasePresenter
 
     protected function pdfExport($content)
     {
-        @ini_set("memory_limit", PDF_MEMORY_LIMIT);
         $content = str_replace("<td", "<td valign='top'", $content);
 
         // Poznamka: zde dany font se nepouzije, pouzije se font z CSS

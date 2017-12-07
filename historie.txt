@@ -35,6 +35,8 @@ Opravy:
 - opravena chyba bránící vytvoření nových položek v číselnících
 - funkce ldap_search je od PHP 7.0 deprecated. Aplikace tedy nyní řadí seznam
   uživatelů z LDAP adresáře sama (dle příjmení a jména uživatele).
+- při exportu do PDF se na konec souboru chybně připojoval HTML kód, který
+  zbytečně zvyšoval velikost výsledného souboru
   
 === Verze 3.5.0 ================================================================
 
