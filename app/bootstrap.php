@@ -19,6 +19,12 @@ final class Bootstrap
             @ini_set('default_charset', 'utf-8');
 
             /**
+             * Nastav locale. LC_MESSAGES chceme v angličtině.
+             */
+            setlocale(LC_ALL, 'cs_CZ.UTF-8');
+            setlocale(LC_MESSAGES, 'en_US.UTF-8');
+            
+            /**
              * Nastav konstantu CLIENT_DIR
              */
             $s = $_SERVER['SCRIPT_FILENAME'];

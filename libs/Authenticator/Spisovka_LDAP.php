@@ -75,10 +75,10 @@ class Spisovka_LDAP extends LDAP_Connection
 
     protected function compare_users($a, $b)
     {
-        $res = strcasecmp($a['prijmeni'], $b['prijmeni']);
+        $res = strcoll($a['prijmeni'], $b['prijmeni']);
         if ($res)
             return $res;
-        return strcasecmp($a['jmeno'], $b['jmeno']);
+        return strcoll($a['jmeno'], $b['jmeno']);
     }
     
     protected function parse_users($info)
