@@ -310,12 +310,13 @@ abstract class BasePresenter extends Nette\Application\UI\Presenter
     protected function pdfExport($content)
     {
         // mPDF obsahuje spoustu chyb a omezení
-        $search = ['<td', '</dd><br />', '<dd></dd>'];
-        $replace = ['<td valign="top"', '</dd>', '<dd>&nbsp;</dd>'];
+        $search = ['<td', '</dd><br />'];
+        $replace = ['<td valign="top"', '</dd>'];
         $content = str_replace($search, $replace, $content);
+        $content = preg_replace('#(<dd[^>]*>)</dd>#s', '\1&nbsp;</dd>', $content);
         // nechceme v PDF vytvářet nesmyslné hypertextové odkazy
         $content = preg_replace('#href="[^"]*"#s', '', $content);
-
+        
         $page_format = in_array($this->view, ["detail", "odetail", "printdetail"]) ? 'A4' : 'A4-L';
         // Poznamka: zde dany font se nepouzije, pouzije se font z CSS
         $mpdf = new \mPDF('iso-8859-2', $page_format, 9, 'Helvetica');
