@@ -14,7 +14,7 @@ class TypDokumentu extends BaseModel
                 ->fetchAssoc('id');
 
         $user = self::getUser();
-        if ($user->inheritsFromRole('admin,superadmin')) {
+        if ($user->inheritsFromRole('admin')) {
             $referent = true;
             $podatelna = true;
         } else if ($user->inheritsFromRole('podatelna')) {

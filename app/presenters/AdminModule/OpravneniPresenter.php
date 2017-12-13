@@ -326,14 +326,16 @@ class Admin_OpravneniPresenter extends BasePresenter
         $this->redirect('this', array('id' => $role_id));
     }
 
-    // Vraci:  0 - nelze menit
-    //  1 - lze menit
-    //  2 - lze, ale zobraz varovani
+    /**
+     * @return int  0 - nelze menit (to v soucasnosti nenastava)
+     * 1 - lze menit
+     * 2 - lze, ale zobraz varovani
+     */
     protected static function lzeMenitRoli($role)
     {
         if (!is_object($role))
             throw new \InvalidArgumentException("Parametr 'role' není objekt.");
-        return in_array($role->code, array("admin", "superadmin")) ? 2 : 1;
+        return in_array($role->code, array("admin")) ? 2 : 1;
     }
 
 }

@@ -167,3 +167,5 @@ Odstranění duplicitních záznamů z tabulky "file" pro odchozí datové zprá
 Oprava vazby mezi zprávou v e-podatelně a ZFO souborem na disku.
 [1630]
 Smazání nepoužívané tabulky.
+[1670]
+Zrušení role "superadmin". Uživateli s touto rolí nastav roli administrátor.

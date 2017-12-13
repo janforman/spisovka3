@@ -308,3 +308,32 @@ function revision_1615_after()
         dibi::query("DELETE FROM [file] WHERE [id] IN %in", $ids);
     }
 }
+
+function revision_1670_after()
+{
+    $admin_role_id = dibi::query("SELECT [id] FROM [acl_role] WHERE [code] = 'admin'")->fetchSingle();
+    $superadmin_role_id = dibi::query("SELECT [id] FROM [acl_role] WHERE [code] = 'superadmin'")->fetchSingle();    
+    if (!$superadmin_role_id)
+        return;
+
+    // Nastav, že role není fixní, aby bylo možné ji smazat
+    dibi::query("UPDATE [acl_role] SET [fixed] = 0 WHERE [id] = $superadmin_role_id");
+    
+    $superadmins = dibi::query("SELECT [user_id] FROM [user_to_role] WHERE [role_id] = $superadmin_role_id")->fetchPairs();
+    if (!$superadmins)
+        return;
+    
+    foreach ($superadmins as $superadmin) {
+        $res = dibi::query("SELECT COUNT(*) FROM [user_to_role] WHERE [user_id] = $superadmin AND [role_id] = $admin_role_id")->fetchSingle();
+        if ($res) {
+            // uživatel je zároveň superadmin a admin
+            dibi::query("DELETE FROM [user_to_role] WHERE [user_id] = $superadmin AND [role_id] = $superadmin_role_id");
+        } else {
+            // uživatel je pouze superadmin
+            dibi::query("UPDATE [user_to_role] SET [role_id] = $admin_role_id WHERE [user_id] = $superadmin AND [role_id] = $superadmin_role_id");
+        }
+        // vynuť nové přihlášení změněného uživatele
+        dibi::query("UPDATE [user] SET [force_logout] = 1 WHERE [id] = $superadmin");
+    }
+        
+}

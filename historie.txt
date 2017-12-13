@@ -20,6 +20,11 @@ Jiné změny:
 - první spuštění aplikace po upgradu na novou verzi provádí aktualizační kroky.
   V předešlých verzích aplikace toto probíhalo skrytě, nyní uživatel vidí 
   průběh aktualizace (také z důvodu, že tento proces může trvat desítky sekund).
+- role SuperAdmin je zrušena, nebude již způsobovat zmatky. Pracovníkům s touto
+  rolí se při upgradu přiřadí role administrátor. Role SuperAdmin se ve verzi
+  3.5 odlišovala pouze možností změnit pole "typ dokumentu" a "způsob doručení"
+  dokumentu po jeho vytvoření. To nyní bude moci provádět uživatel s rolí admi-
+  nistrátor.
 
 Opravy:
 

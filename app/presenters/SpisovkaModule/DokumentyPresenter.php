@@ -953,7 +953,7 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
         $povolene_typy_dokumentu = TypDokumentu::dostupneUzivateli();
 
-        $lze_menit_urcita_pole = $Dok->stav == 1 || $this->user->isInRole('superadmin');
+        $lze_menit_urcita_pole = $Dok->stav == 1 || $this->user->isInRole('admin');
         if ($lze_menit_urcita_pole && in_array($Dok->typ_dokumentu->id,
                         array_keys($povolene_typy_dokumentu)) && count($povolene_typy_dokumentu) > 1) {
             $form->addSelect('dokument_typ_id', 'Typ Dokumentu:', $povolene_typy_dokumentu);

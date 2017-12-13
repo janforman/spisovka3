@@ -19,7 +19,7 @@ class Admin_ExportPresenter extends BasePresenter
     protected function isUserAllowed()
     {
         $user = $this->user;
-        return $user->isInRole('admin') || $user->isInRole('superadmin');
+        return $user->isInRole('admin');
     }
 
     protected function _error($msg)
