@@ -9,7 +9,6 @@
     
     define("APP_DIR", __DIR__ . "/app");
     define("LIBS_DIR", __DIR__ . "/libs");
-    define("PUBLIC_URI", "public/");
         
     include APP_DIR . "/aktualizace/aktualizace.php";
     

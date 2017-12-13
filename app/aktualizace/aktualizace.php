@@ -1,12 +1,14 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+<?php
+
+$page_header = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
     <title>Spisová služba - Aktualizace</title>
-    <link rel="stylesheet" type="text/css" media="screen" href="<?php echo PUBLIC_URI; ?>css/site.css" />
-    <link rel="stylesheet" type="text/css" media="screen" href="<?php echo PUBLIC_URI; ?>css/install_site.css" />
-    <link rel="shortcut icon" href="<?php echo PUBLIC_URI; ?>favicon.ico" type="image/x-icon" />
+    <link rel="stylesheet" type="text/css" media="screen" href="public/css/site.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="public/css/install_site.css" />
+    <link rel="shortcut icon" href="public/favicon.ico" type="image/x-icon" />
 </head>
 <body>
 <div id="layout_top">
@@ -21,10 +23,22 @@
     </div>
 </div>
 <div id="layout">
-<?php
+';
+
+$page_footer = '    </div>
+</div>
+<div id="layout_bottom">
+    <div id="bottom">
+        <strong>OSS Spisová služba</strong><br/>
+        Na toto dílo se vztahuje licence EUPL v.1.1</a>
+    </div>
+</div>
+</body>
+</html>';
 
 use Spisovka\Updates;
 use Spisovka\Client_To_Update;
+use Tracy\Debugger;
 
 function error($message)
 {
@@ -38,6 +52,7 @@ function my_assert_handler($file, $line, $code)
 }
 
 try {
+    $page_header_sent = false;
     assert_options(ASSERT_ACTIVE, 1);
     assert_options(ASSERT_BAIL, 1);
     assert_options(ASSERT_WARNING, 0);
@@ -47,8 +62,8 @@ try {
         ini_set('date.timezone', 'Europe/Prague');
     set_time_limit(0);
 
-    define('VENDOR_DIR', dirname(APP_DIR) . '/vendor');
-    require VENDOR_DIR . '/autoload.php';
+    $vendor_dir = dirname(APP_DIR) . '/vendor';
+    require "$vendor_dir/autoload.php";
 
     $loader = new Nette\Loaders\RobotLoader();
     $loader->addDirectory(APP_DIR);
@@ -56,6 +71,14 @@ try {
     $loader->setCacheStorage(new Nette\Caching\Storages\DevNullStorage());
     $loader->register();
 
+    $debug_mode = 0;
+    Debugger::enable($debug_mode ? Debugger::DEVELOPMENT : Debugger::PRODUCTION);
+    ini_set('display_errors', 1); // chyby chceme zobrazovat i v produkčním režimu
+    Nette\Bridges\Framework\TracyBridge::initialize();
+    
+    // Debugger je nutné aktivovat dříve, než cokoli pošleme na výstup
+    echo $page_header; $page_header_sent = true;
+    
     Updates::init();
     
     $res = Updates::find_updates();
@@ -67,6 +90,8 @@ try {
 
     $clients = Updates::find_clients();
 } catch (\Exception $e) {
+    if (!$page_header_sent)
+        echo $page_header;
     error($e->getMessage());
     die;
 }
@@ -78,11 +103,11 @@ if ($do_update)
     echo '<a href="aktualizace.php">Znovu zkontrolovat</a>';
 else
     echo '<a href="aktualizace.php?go=1" onclick="return confirm(\'Opravdu chcete provést aktualizaci spisové služby?\');">Spustit aktualizaci</a>';
-echo '    </div>
+echo '</div>
     <div id="content">';
 
-if (version_compare(PHP_VERSION, '5.5.0', '<')) {
-    error ('Aplikace vyžaduje PHP verze 5.5 nebo novější.');
+if (version_compare(PHP_VERSION, '5.6.0', '<')) {
+    error ('Aplikace vyžaduje PHP verze 5.6 nebo novější.');
     die;
 }
 
@@ -108,6 +133,12 @@ foreach ($clients as $site_path => $site_name) {
         echo '</dl>';
 
         $client->connect_to_db();
+
+        if ($debug_mode) {
+            // false - Neni treba explain SELECT dotazu
+            $panel = new Dibi\Bridges\Tracy\Panel(false, DibiEvent::ALL);
+            $panel->register(dibi::getConnection());
+        }
 
         $mysqli = dibi::getConnection()->getDriver()->getResource();
         $version_number = $mysqli->server_version;
@@ -301,6 +332,7 @@ foreach ($clients as $site_path => $site_name) {
 }
 
 // Konec php programu
+echo $page_footer;
 
 
 function deleteDir($dir, $dir_parent = null)
@@ -339,16 +371,3 @@ function deleteDir($dir, $dir_parent = null)
     return false;
 }
 
-?>
-    </div>
-</div>
-<div id="layout_bottom">
-    <div id="bottom">
-        <strong>OSS Spisová služba</strong><br/>
-        Na toto dílo se vztahuje licence EUPL v.1.1</a>
-    </div>
-</div>
-
-
-</body>
-</html>
