@@ -11,8 +11,6 @@ class UserAccount extends CachedDBEntity
 {
 
     const TBL_NAME = 'user';
-    const ROLE_TABLE = 'acl_role';
-    const USER2ROLE_TABLE = 'user_to_role';
 
     public function __construct($param)
     {
@@ -65,8 +63,8 @@ class UserAccount extends CachedDBEntity
     public function getRoles()
     {
         $rows = dibi::fetchAll('SELECT r.*
-                                 FROM [:PREFIX:' . self::USER2ROLE_TABLE . '] ur
-                                 LEFT JOIN [:PREFIX:' . self::ROLE_TABLE . '] r ON (r.id = ur.role_id)
+                                 FROM [user_to_role] ur
+                                 LEFT JOIN [acl_role] r ON (r.id = ur.role_id)
                                  WHERE ur.user_id = %i', $this->id);
 
         return $rows ? $rows : NULL;
@@ -101,8 +99,7 @@ class UserAccount extends CachedDBEntity
      */
     public static function getByName($username)
     {
-        $id = dibi::query("SELECT [id] FROM %n WHERE [username] = %s", self::TBL_NAME,
-                        $username)->fetchSingle();
+        $id = dibi::query("SELECT [id] FROM %n WHERE [username] = %s", self::TBL_NAME, $username)->fetchSingle();
 
         return $id === false ? null : self::fromId($id);
     }

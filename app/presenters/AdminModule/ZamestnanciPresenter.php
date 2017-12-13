@@ -14,8 +14,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $client_config = GlobalVariables::get('client_config');
         $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
-                    : 20;
+        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek : 20;
 
         // hledani
         $this->template->no_items = 0;
@@ -64,7 +63,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $Auth->setParams(['osoba_id' => $person->id, 'user_id' => $a->id]);
         return $Auth;
     }
-    
+
     protected function createComponentChangeAuthTypeForm()
     {
         $a = new UserAccount($this->getParameter('id'));
@@ -74,12 +73,12 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $Auth->setParams(['osoba_id' => $person->id, 'user_id' => $a->id]);
         return $Auth;
     }
-    
+
     public function actionSmazatUcet($id)
     {
         $account = new UserAccount($id);
         try {
-            $account->deactivate();            
+            $account->deactivate();
             $this->flashMessage('Účet uživatele byl smazán.');
         } catch (\Exception $e) {
             $this->flashMessage($e->getMessage(), 'warning');
@@ -95,7 +94,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
         $this->template->remote_auth_supported = $this->context->getService('authenticator')->supportsRemoteAuth();
 
         $roles = $account->getRoles();
-        $this->template->roles = $roles ? : [];
+        $this->template->roles = $roles ?: [];
     }
 
     public function renderDetail($id)
@@ -182,8 +181,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             $this->flashMessage('Zaměstnanec  "' . Osoba::displayName($data) . '"  byl upraven.');
             $this->redirect('this', array('id' => $osoba_id));
         } catch (DibiException $e) {
-            $this->flashMessage('Zaměstnanec  "' . Osoba::displayName($data) . '"  se nepodařilo upravit.',
-                    'warning');
+            $this->flashMessage('Zaměstnanec  "' . Osoba::displayName($data) . '"  se nepodařilo upravit.', 'warning');
             Nette\Diagnostics\Debugger::dump($e);
         }
     }
@@ -209,8 +207,7 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             $this->redirect(':Admin:Zamestnanci:detail', ['id' => $person->id]);
         } catch (DibiException $e) {
             $e->getMessage();
-            $this->flashMessage('Zaměstnance "' . Osoba::displayName($data) . '" se nepodařilo vytvořit.',
-                    'warning');
+            $this->flashMessage('Zaměstnance "' . Osoba::displayName($data) . '" se nepodařilo vytvořit.', 'warning');
             //$this->flashMessage('Chyba: '. $e->getMessage(),'warning');
         }
     }
@@ -277,11 +274,8 @@ class Admin_ZamestnanciPresenter extends BasePresenter
 
         $user_role = (new UserAccount($user_id))->getRoles();
 
-        //Nette\Diagnostics\Debugger::dump($data);
-        //Nette\Diagnostics\Debugger::dump($user_role);
         // Predkontrola - vyrazeni nemenici role
         foreach ($data as $id => $stav) {
-
             $role_id = (int) substr($id, 4); // role4
             // porovnat s puvodnim daty = role, ktere se nemenily, vyradime
             foreach ($user_role as $urole_id => $urole) {
@@ -293,20 +287,12 @@ class Admin_ZamestnanciPresenter extends BasePresenter
             }
         }
 
-        //echo "===================";
-        //Nette\Diagnostics\Debugger::dump($data);
-        //Nette\Diagnostics\Debugger::dump($user_role);
         // odebrani nevybranych roli
-        if (count($data) > 0) {
+        if (count($data)) {
             foreach ($data as $id => $stav) {
                 $role_id = (int) substr($id, 4);
-                if (!empty($role_id) && !empty($user_id)) {
-                    $UserRole->delete(array(
-                        array('role_id=%i', $role_id),
-                        array('user_id=%i', $user_id)
-                            )
-                    );
-                }
+                if (!empty($role_id) && !empty($user_id))
+                    $UserRole->delete([['role_id = %i', $role_id], ['user_id = %i', $user_id]]);
             }
         }
 
@@ -376,25 +362,26 @@ class Admin_ZamestnanciPresenter extends BasePresenter
                 ->setRequired();
         if (isset($this->template->u))
             $c->setDefaultValue($this->template->u->username);
-        
+
         $form->addSubmit('upravit', 'Změnit')
                 ->onClick[] = array($this, 'zmenitUsernameClicked');
         $form->addSubmit('storno', 'Zrušit')
                         ->setValidationScope(FALSE)
                 ->onClick[] = array($this, 'stornoClicked');
-        
+
         return $form;
     }
-    
+
     public function zmenitUsernameClicked(Nette\Forms\Controls\SubmitButton $button)
     {
         $data = $button->getForm()->getValues();
-        
+
         $a = new UserAccount($this->getParameter('id'));
         $a->username = $data->username;
         $a->save();
-        
+
         $this->flashMessage('Uživatelské jméno bylo změněno.');
         $this->redirect('this');
     }
+
 }
