@@ -90,7 +90,7 @@ class EpodatelnaPrilohy
      */
     protected static function getFileList2(EpodatelnaMessage $message, $storage)
     {
-        if ($message->typ == 'I') {
+        if ($message instanceof IsdsMessage) {
             // vrat, co uz je v databazi, zde nebyly bugy v kodu
             return unserialize($message->prilohy);
         }

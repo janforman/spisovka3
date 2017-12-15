@@ -248,7 +248,7 @@ abstract class DBEntity implements \IteratorAggregate
 
         $resultSet = dibi::query($query);
 
-        return self::_createObjectsFromDibiResult($resultSet);
+        return static::_createObjectsFromDibiResult($resultSet);
     }
 
     public static function getCount(array $where = array())

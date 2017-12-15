@@ -12,10 +12,10 @@ class Epodatelna_PrilohyPresenter extends BasePresenter
         $file_id = $file;
         $msg = EpodatelnaMessage::factory($id);
 
-        if ($msg->typ == 'E') {
+        if ($msg instanceof EmailMessage) {
             $path = $msg->getEmailFile($this->storage);
             $soubor = EpodatelnaPrilohy::getEmailPart($path, $file_id);
-        } elseif ($msg->typ == 'I') {
+        } elseif ($msg instanceof IsdsMessage) {
             $path = $msg->getIsdsFile($this->storage);
             $soubor = EpodatelnaPrilohy::getIsdsFile($path, $file_id);
         }

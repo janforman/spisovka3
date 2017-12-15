@@ -27,6 +27,25 @@ class EpodatelnaMessage extends DBEntity
         throw new \Exception(__METHOD__ . "() - neplatný typ zprávy ID $id");
     }
 
+    /** Upravená kopie metody z DBEntity
+     * @param \DibiResult $dr
+     * @return \static[]
+     */
+    protected static function _createObjectsFromDibiResult(\DibiResult $dr)
+    {
+        $a = array();
+
+        foreach ($dr as $row) {
+            if ($row->typ !== 'E' && $row->typ !== 'I')
+                throw new \Exception(__METHOD__ . "() - neplatný typ zprávy ID $row->id");
+            $o = $row->typ === 'E' ? new EmailMessage((int) $row->id) : new IsdsMessage((int) $row->id);
+            $o->_setData($row);
+            $a[$o->id] = $o;
+        }
+
+        return $a;
+    }
+
     /**
      * Vrátí (příchozí) zprávu, ze které byl dokument vytvořen.
      * @param Document $doc
@@ -34,8 +53,7 @@ class EpodatelnaMessage extends DBEntity
      */
     public static function fromDocument(Document $doc)
     {
-        $res = dibi::query("SELECT [id] FROM %n WHERE [dokument_id] = %i AND NOT [odchozi]",
-                        self::TBL_NAME, $doc->id);
+        $res = dibi::query("SELECT [id] FROM %n WHERE [dokument_id] = %i AND NOT [odchozi]", self::TBL_NAME, $doc->id);
         if (count($res) != 1)
             throw new \Exception("Nemohu nalézt zprávu, ze které byl dokument ID {$doc->id} vytvořen.");
 
@@ -48,6 +66,12 @@ class EpodatelnaMessage extends DBEntity
 class EmailMessage extends EpodatelnaMessage
 {
 
+    public static function create(array $data)
+    {
+        $data['typ'] = 'E';
+        return parent::create($data);
+    }
+    
     /**
      *  Vrátí odkaz na soubor s e-mailem.
      * @param Storage_Basic $storage
@@ -71,14 +95,20 @@ class EmailMessage extends EpodatelnaMessage
 class IsdsMessage extends EpodatelnaMessage
 {
 
+    public static function create(array $data)
+    {
+        $data['typ'] = 'I';
+        return parent::create($data);
+    }
+
     public static function getAll(array $params = array())
     {
         if (!$params)
             $params = ['where' => "[typ] = 'I'"];
-        
+
         return parent::getAll($params);
     }
-    
+
     /**
      * Vrátí soubor se serializovaným objektem s informacemi o zprávě.
      * @param Storage_Basic $storage
@@ -135,7 +165,7 @@ class IsdsMessage extends EpodatelnaMessage
     {
         return unserialize($this->isds_envelope);
     }
-    
+
     /**
      * Zformátuje uloženou obálku zprávy pro zobrazení. Výstup se liší pro příchozí a odchozí zprávu.
      * @return string  plain text
@@ -157,7 +187,7 @@ class IsdsMessage extends EpodatelnaMessage
                 $popis .= " písmeno $env->dmLegalTitlePoint";
             $popis .= "\n\n";
         }
-        
+
         $popis .= "Číslo jednací odesilatele  : " . $env->dmSenderRefNumber . "\n";
         $popis .= "Spisová značka odesilatele : " . $env->dmSenderIdent . "\n";
         $popis .= "Číslo jednací příjemce     : " . $env->dmRecipientRefNumber . "\n";
@@ -184,7 +214,7 @@ class IsdsMessage extends EpodatelnaMessage
 
         $dt_dodani = strtotime($env->dmDeliveryTime);
         $popis .= "\nDatum a čas dodání   : " . date("j.n.Y G:i:s", $dt_dodani) . "\n";
-        
+
         // dmAttachmentSize obsahuje chybný údaj, pravděpodobně udává velikost po zakódování do base64
         // $popis .= "Přibližná velikost všech příloh : " . $status->dmAttachmentSize . " kB\n";
 

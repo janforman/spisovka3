@@ -65,8 +65,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $client_config = GlobalVariables::get('client_config');
         $vp = new Components\VisualPaginator($this, 'vp', $this->getHttpRequest());
         $paginator = $vp->getPaginator();
-        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek
-                    : 20;
+        $paginator->itemsPerPage = isset($client_config->nastaveni->pocet_polozek) ? $client_config->nastaveni->pocet_polozek : 20;
 
         $args = ['where' => []];
         $args['where'][] = ['odchozi = %i', $outgoing];
@@ -109,8 +108,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 // záložní řešení, takto fungovalo zobrazení datové zprávy dříve
                 // odstraň z výpisu nepravdivé/zavádějící informace
                 $popis = $this->template->Zprava->popis;
-                $this->template->Zprava->popis = preg_replace('/Status.*Přibl/s', 'Přibl',
-                        $popis);
+                $this->template->Zprava->popis = preg_replace('/Status.*Přibl/s', 'Přibl', $popis);
             }
 
             if ($doruceni)
@@ -126,8 +124,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         }
 
         if ($msg instanceof EmailMessage)
-            $this->addComponent(new Components\EmailSignature($msg, $this->storage),
-                    'emailSignature');
+            $this->addComponent(new Components\EmailSignature($msg, $this->storage), 'emailSignature');
 
         $this->template->Dokument = null;
         if (!empty($msg->dokument_id)) {
@@ -144,8 +141,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
     public function renderZkontrolovat()
     {
         $config = (new ConfigEpodatelna())->get();
-        $this->template->RequestIsdsPassword = $config['isds']['aktivni'] && Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN,
-                        false) && empty(UserSettings::get('isds_password'));
+        $this->template->RequestIsdsPassword = $config['isds']['aktivni'] && Settings::get(Admin_EpodatelnaPresenter::ISDS_INDIVIDUAL_LOGIN, false) && empty(UserSettings::get('isds_password'));
     }
 
     /** Stáhne zprávy ze všech schránek a dá uživateli vědět výsledek
@@ -217,98 +213,96 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         $isds_subjekt_cache = [];
         $email_subjekt_cache = [];
 
-        $args = array(
-            'where' => array('(ep.stav = 0 OR ep.stav = 1) AND ep.odchozi = 0')
-        );
-        $result = $this->Epodatelna->seznam($args);
-        $zpravy = $result->fetchAll();
+        $args = [
+            'where' => ['(stav = 0 OR stav = 1) AND odchozi = 0'],
+            'order' => ['doruceno_dne' => 'DESC']
+        ];
+        $zpravy = EpodatelnaMessage::getAll($args);
 
-        if (!$zpravy)
-            $zpravy = [];
-        else
-            foreach ($zpravy as $zprava) {
+        foreach ($zpravy as &$zprava) {
 
-                unset($zprava->identifikator);
+            unset($zprava->identifikator);
 
-                $prilohy = unserialize($zprava->prilohy);
-                if ($zprava->typ == 'I' && $prilohy !== false)
-                    $zprava->prilohy = $prilohy;
-                else
-                    $zprava->prilohy = false;
+            $prilohy = unserialize($zprava->prilohy);
+            if ($zprava instanceof IsdsMessage && $prilohy !== false)
+                $zprava->prilohy = $prilohy;
+            else
+                $zprava->prilohy = false;
 
-                $subjekt = new \stdClass();
-                $subjekt->mesto = '';
-                $subjekt->psc = '';
-                $subjekt->ulice = '';
-                $subjekt->cp = '';
-                $subjekt->co = '';
-                $subjekt->jmeno = '';
-                $subjekt->prijmeni = '';
+            $subjekt = new \stdClass();
+            $subjekt->mesto = '';
+            $subjekt->psc = '';
+            $subjekt->ulice = '';
+            $subjekt->cp = '';
+            $subjekt->co = '';
+            $subjekt->jmeno = '';
+            $subjekt->prijmeni = '';
 
-                $message = null;
-                $nalezene_subjekty = null;
-                if ($zprava->typ == 'E') {
-// Nacteni originalu emailu
-                    if (!empty($zprava->file_id)) {
-                        $sender = $zprava->odesilatel;
-                        $matches = [];
-                        if (preg_match('/(.*)<(.*)>/', $sender, $matches)) {
-                            $subjekt->email = $matches[2];
-                            $subjekt->nazev_subjektu = trim($matches[1]);
-                            $subjekt->prijmeni = $subjekt->nazev_subjektu;
-                        } else {
-                            $subjekt->email = $sender;
-                            $subjekt->nazev_subjektu = null;
-                        }
-                        $matches = [];
-                        if (preg_match('/^(.*) ([^ ]*)$/', $subjekt->prijmeni, $matches)) {
-                            $subjekt->jmeno = $matches[1];
-                            $subjekt->prijmeni = $matches[2];
-                        }
-
-                        if (!isset($email_subjekt_cache[$subjekt->email])) {
-                            $search = ['email' => $subjekt->email, 'nazev_subjektu' => $subjekt->nazev_subjektu];
-                            $search = \Nette\Utils\ArrayHash::from($search);
-                            $email_subjekt_cache[$subjekt->email] = $SubjektModel->hledat($search,
-                                    'email', true);
-                        }
-                        $nalezene_subjekty = $email_subjekt_cache[$subjekt->email];
+            $message = null;
+            $nalezene_subjekty = null;
+            if ($zprava instanceof EmailMessage) {
+                if (!empty($zprava->file_id)) {
+                    $sender = $zprava->odesilatel;
+                    $matches = [];
+                    if (preg_match('/(.*)<(.*)>/', $sender, $matches)) {
+                        $subjekt->email = $matches[2];
+                        $subjekt->nazev_subjektu = trim($matches[1]);
+                        $subjekt->prijmeni = $subjekt->nazev_subjektu;
+                    } else {
+                        $subjekt->email = $sender;
+                        $subjekt->nazev_subjektu = null;
                     }
-                } else if ($zprava->typ == 'I') {
-                    $zprava->popis = '';
-                    // Nacteni originalu DS
-                    if (!empty($zprava->file_id)) {
-                        $message = $this->storage->download($zprava->file_id, true);
-                        $message = unserialize($message);
-                        // $message je odpoved serveru ISDS na operaci DownloadMessage
-                        // zprava samotna je v $message->dmDm;
-                        if (isset($message->dmDm->dbIDSender)) {
-                            $subjekt->id_isds = $message->dmDm->dbIDSender;
-                            $subjekt->nazev_subjektu = $message->dmDm->dmSender;
-                            $subjekt->type = ISDS_Spisovka::typDS($message->dmDm->dmSenderType);
-                            if (isset($message->dmDm->dmSenderAddress)) {
-                                $res = ISDS_Spisovka::parseAddress($message->dmDm->dmSenderAddress);
-                                foreach ($res as $key => $value)
-                                    $subjekt->$key = $value;
-                            }
+                    $matches = [];
+                    if (preg_match('/^(.*) ([^ ]*)$/', $subjekt->prijmeni, $matches)) {
+                        $subjekt->jmeno = $matches[1];
+                        $subjekt->prijmeni = $matches[2];
+                    }
 
-                            if (!isset($isds_subjekt_cache[$subjekt->id_isds]))
-                                $isds_subjekt_cache[$subjekt->id_isds] = $SubjektModel->hledat($subjekt,
-                                        'isds', true);
-                            $nalezene_subjekty = $isds_subjekt_cache[$subjekt->id_isds];
+                    if (!isset($email_subjekt_cache[$subjekt->email])) {
+                        $search = ['email' => $subjekt->email, 'nazev_subjektu' => $subjekt->nazev_subjektu];
+                        $search = Nette\Utils\ArrayHash::from($search);
+                        $email_subjekt_cache[$subjekt->email] = $SubjektModel->hledat($search, 'email', true);
+                    }
+                    $nalezene_subjekty = $email_subjekt_cache[$subjekt->email];
+                }
+            } else if ($zprava instanceof IsdsMessage) {
+                $zprava->popis = '';
+                // Nacteni originalu DS
+                if (!empty($zprava->file_id)) {
+                    $message = $this->storage->download($zprava->file_id, true);
+                    $message = unserialize($message);
+                    // $message je odpoved serveru ISDS na operaci DownloadMessage
+                    // zprava samotna je v $message->dmDm;
+                    if (isset($message->dmDm->dbIDSender)) {
+                        $subjekt->id_isds = $message->dmDm->dbIDSender;
+                        $subjekt->nazev_subjektu = $message->dmDm->dmSender;
+                        $subjekt->type = ISDS_Spisovka::typDS($message->dmDm->dmSenderType);
+                        if (isset($message->dmDm->dmSenderAddress)) {
+                            $res = ISDS_Spisovka::parseAddress($message->dmDm->dmSenderAddress);
+                            foreach ($res as $key => $value)
+                                $subjekt->$key = $value;
                         }
+
+                        if (!isset($isds_subjekt_cache[$subjekt->id_isds]))
+                            $isds_subjekt_cache[$subjekt->id_isds] = $SubjektModel->hledat($subjekt, 'isds', true);
+                        $nalezene_subjekty = $isds_subjekt_cache[$subjekt->id_isds];
                     }
                 }
-
-                $zprava->subjekt = ['original' => $subjekt, 'databaze' => $nalezene_subjekty];
-
-                $doruceno_dne = strtotime($zprava->doruceno_dne);
-                $zprava->doruceno_dne_datum = date("j.n.Y", $doruceno_dne);
-                $zprava->doruceno_dne_cas = date("G:i:s", $doruceno_dne);
-                $zprava->odesilatel = htmlspecialchars($zprava->odesilatel);
             }
 
-        $this->sendJson($zpravy);
+            // konvertuj objekt do stdClass, abychom mohli přidat další atributy
+            $zprava = (object) (array) $zprava->getData();
+
+            $zprava->subjekt = ['original' => $subjekt, 'databaze' => $nalezene_subjekty];
+
+            $doruceno_dne = strtotime($zprava->doruceno_dne);
+            $zprava->doruceno_dne_datum = date("j.n.Y", $doruceno_dne);
+            $zprava->doruceno_dne_cas = date("G:i:s", $doruceno_dne);
+            $zprava->odesilatel = htmlspecialchars($zprava->odesilatel);
+        }
+
+        // pro export do JSON potřebujeme obyčejné pole s číselnými indexy 0,1,...
+        $this->sendJson(array_values($zpravy));
     }
 
     /**
@@ -352,7 +346,6 @@ class Epodatelna_DefaultPresenter extends BasePresenter
 
                         $new_record = array();
                         $new_record['odchozi'] = 0;
-                        $new_record['typ'] = 'I';
                         $new_record['poradi'] = $this->Epodatelna->getMax();
                         $new_record['rok'] = date('Y');
                         $new_record['isds_id'] = $z->dmID;
@@ -395,8 +388,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                         $stav_info = '';
                         if ($z->dmMessageStatus >= 6) {
                             $signedmess = $isds->SignedMessageDownload($z->dmID);
-                            $file_signed = $this->storage->uploadEpodatelna($signedmess,
-                                    $file_data, $this->user);
+                            $file_signed = $this->storage->uploadEpodatelna($signedmess, $file_data, $this->user);
                             if (!$file_signed)
                                 $stav_info = 'Podepsanou zprávu se nepodařilo uložit';
                         } else
@@ -409,8 +401,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                             'popis' => 'Byte-stream reprezentace ISDS zprávy z epodatelny ' . $msg->poradi . '-' . $msg->rok
                         );
 
-                        if ($file = $this->storage->uploadEpodatelna(serialize($complete_msg),
-                                $file_data, $this->user)) {
+                        if ($file = $this->storage->uploadEpodatelna(serialize($complete_msg), $file_data, $this->user)) {
                             // ok
                             if (empty($stav_info))
                                 $stav_info = 'Zpráva byla uložena';
@@ -468,8 +459,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
         foreach ($messages as $message) {
             // kontrola existence v epodatelne
             // chybi-li Message ID, jedna se pravdepodobne o Spam
-            if (!isset($message->message_id) || $this->Epodatelna->existuje($message->message_id,
-                            'email'))
+            if (!isset($message->message_id) || $this->Epodatelna->existuje($message->message_id, 'email'))
                 continue;
 
             // nova zprava, ktera neni nahrana v epodatelne
@@ -539,12 +529,11 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 }
             }
 
-            $epod_id = $this->Epodatelna->insert($insert);
+            $zprava = EmailMessage::create($insert);
 
             if ($insert['stav'] == 100) {
                 try {
-                    $reply_address = !empty($message->reply_toaddress) ? $message->reply_toaddress
-                                : $message->fromaddress;
+                    $reply_address = !empty($message->reply_toaddress) ? $message->reply_toaddress : $message->fromaddress;
                     $mail = new Mail;
                     $mail->setFromConfig();
                     $mail->addTo($reply_address);
@@ -561,7 +550,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
             }
 
             $data = array(
-                'filename' => 'ep_email_' . $epod_id . '.eml',
+                'filename' => 'ep_email_' . $zprava->id . '.eml',
                 'dir' => 'EP-I-' . sprintf('%06d', $insert['poradi']) . '-' . $insert['rok'],
                 'typ' => '5',
                 'popis' => 'E-mailová zpráva z epodatelny ' . $insert['poradi'] . '-' . $insert['rok']
@@ -576,7 +565,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                 $update_data = ['stav_info' => 'Originál zprávy se nepodařilo uložit'];
             }
             $this->Epodatelna->update(
-                    $update_data, [['id = %i', $epod_id]]
+                    $update_data, [['id = %i', $zprava->id]]
             );
 
             $messages_recorded++;

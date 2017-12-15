@@ -40,7 +40,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
         $this->template->Prilohy = EpodatelnaPrilohy::getFileList($zprava, $this->storage);
 
-        if ($zprava->typ == 'E') {
+        if ($zprava instanceof EmailMessage) {
             $sender = $zprava->odesilatel;
             $matches = [];
             if (preg_match('/(.*)<(.*)>/', $sender, $matches)) {
@@ -55,7 +55,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $found_subjects = $SubjektModel->hledat($search, 'email');
             $message_subject = $search;
         }
-        if ($zprava->typ == 'I') {
+        if ($zprava instanceof IsdsMessage) {
             $dm = $this->storage->download($zprava->file_id, true);
             $dm = unserialize($dm);
 
@@ -184,7 +184,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
         $form->addTextArea('predani_poznamka', 'Poznámka:', 80, 3);
 
         $form['nazev']->setDefaultValue($zprava->predmet);
-        if ($zprava->typ == 'E' && Settings::get('epodatelna_copy_email_into_documents_note'))
+        if ($zprava instanceof EmailMessage && Settings::get('epodatelna_copy_email_into_documents_note'))
             $form['poznamka']->setDefaultValue(@html_entity_decode($zprava->popis));
         $unixtime = strtotime($zprava->doruceno_dne);
         $datum = date('d.m.Y', $unixtime);
@@ -239,7 +239,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
 
             $d = [
                 'dokument_typ_id' => isset($data['dokument_typ_id']) ? $data['dokument_typ_id'] : 1,
-                'zpusob_doruceni_id' => $zprava->typ == 'E' ? 1 : 2,
+                'zpusob_doruceni_id' => $zprava instanceof EmailMessage ? 1 : 2,
                 'poradi' => 1,
                 'stav' => 1,
                 'nazev' => $data['nazev'],
@@ -270,9 +270,9 @@ class Epodatelna_EvidencePresenter extends BasePresenter
             $Log->logDocument($doc_id, LogModel::DOK_NOVY);
 
             // Ulozeni souboru
-            if ($zprava->typ == 'E') {
+            if ($zprava instanceof EmailMessage) {
                 $this->evidujEmailSoubory($zprava->id, $doc_id);
-            } else if ($zprava->typ == 'I') {
+            } else if ($zprava instanceof IsdsMessage) {
                 $this->evidujIsdsSoubory($zprava->id, $doc_id);
             }
 
@@ -315,7 +315,7 @@ class Epodatelna_EvidencePresenter extends BasePresenter
                 $predano = $this->user->displayName;
             }
 
-            if ($zprava->typ == 'E') {
+            if ($zprava instanceof EmailMessage) {
                 $email_info = array(
                     'jid' => $document->jid,
                     'nazev' => $zprava->predmet,

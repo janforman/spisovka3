@@ -1673,7 +1673,6 @@ class Spisovka_DokumentyPresenter extends BasePresenter
 
             $zprava = array();
             $zprava['odchozi'] = 1;
-            $zprava['typ'] = 'I';
             $zprava['poradi'] = $Epodatelna->getMax(1);
             $zprava['rok'] = date('Y');
             $zprava['isds_id'] = $msg->dmID;
