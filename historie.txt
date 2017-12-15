@@ -31,6 +31,8 @@ Opravy:
 - v seznamu příchozích zpráv v e-podatelně se nyní zobrazuje a řadí dle 
   data dodání datové zprávy do schránky, ne data doručení (které v některých
   případech neodpovídalo skutečnosti)
+- v seznamu příchozích zpráv po kontrole schránek se nyní po kliknutí na
+  "Zobrazit zprávu >>" správně zobrazí obálka datové zprávy
 - při evidování datové zprávy se nyní automaticky přenese "číslo jednací odesi-
   latele" z datové zprávy
 - proces vytváření odpovědi na dokument byl změněn do jednoho nedělitelného

@@ -266,7 +266,7 @@ class Epodatelna_DefaultPresenter extends BasePresenter
                     $nalezene_subjekty = $email_subjekt_cache[$subjekt->email];
                 }
             } else if ($zprava instanceof IsdsMessage) {
-                $zprava->popis = '';
+                $zprava->popis = $zprava->formatEnvelope();
                 // Nacteni originalu DS
                 if (!empty($zprava->file_id)) {
                     $message = $this->storage->download($zprava->file_id, true);
