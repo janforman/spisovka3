@@ -242,8 +242,6 @@ foreach ($clients as $site_path => $site_name) {
 
                     echo "<pre>";
                     foreach ($alter_scripts[$rev] as $query) {
-                        $query = str_replace("{tbls3}", '', $query);
-
                         if ($do_update) {
                             try {
                                 dibi::query($query);
